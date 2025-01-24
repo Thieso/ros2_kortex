@@ -134,6 +134,7 @@ private:
   k_api::BaseCyclic::Feedback feedback_;
   std::vector<double> arm_commands_positions_;
   std::vector<double> arm_commands_velocities_;
+  std::vector<double> arm_commands_accelerations_;
   std::vector<double> arm_commands_efforts_;
   std::vector<double> arm_positions_;
   std::vector<double> arm_velocities_;

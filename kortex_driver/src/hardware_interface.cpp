@@ -244,6 +244,7 @@ CallbackReturn KortexMultiInterfaceHardware::on_init(const hardware_interface::H
   arm_efforts_.resize(actuator_count_, std::numeric_limits<double>::quiet_NaN());
   arm_commands_positions_.resize(actuator_count_, std::numeric_limits<double>::quiet_NaN());
   arm_commands_velocities_.resize(actuator_count_, std::numeric_limits<double>::quiet_NaN());
+  arm_commands_accelerations_.resize(actuator_count_, std::numeric_limits<double>::quiet_NaN());
   arm_commands_efforts_.resize(actuator_count_, std::numeric_limits<double>::quiet_NaN());
   arm_joints_control_level_.resize(
     actuator_count_, integration_lvl_t::UNDEFINED);  // start in undefined
@@ -361,6 +362,8 @@ KortexMultiInterfaceHardware::export_command_interfaces()
         arm_joint_names[i], hardware_interface::HW_IF_POSITION, &arm_commands_positions_[i]));
       command_interfaces.emplace_back(hardware_interface::CommandInterface(
         arm_joint_names[i], hardware_interface::HW_IF_VELOCITY, &arm_commands_velocities_[i]));
+      command_interfaces.emplace_back(hardware_interface::CommandInterface(
+        arm_joint_names[i], hardware_interface::HW_IF_ACCELERATION, &arm_commands_accelerations_[i]));
       command_interfaces.emplace_back(hardware_interface::CommandInterface(
         arm_joint_names[i], hardware_interface::HW_IF_EFFORT, &arm_commands_efforts_[i]));
     }
@@ -592,6 +595,7 @@ return_type KortexMultiInterfaceHardware::perform_command_mode_switch(
     joint_based_controller_running_ = false;
     arm_commands_positions_ = arm_positions_;
     arm_commands_velocities_ = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+    arm_commands_accelerations_ = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
   }
   if (stop_twist_controller_)
   {
@@ -616,6 +620,7 @@ return_type KortexMultiInterfaceHardware::perform_command_mode_switch(
     twist_controller_running_ = false;
     arm_commands_positions_ = arm_positions_;
     arm_commands_velocities_ = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+    arm_commands_accelerations_ = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
     joint_based_controller_running_ = true;
     // refresh feedback
     feedback_ = base_cyclic_.RefreshFeedback();
@@ -708,6 +713,10 @@ CallbackReturn KortexMultiInterfaceHardware::on_activate(
     if (std::isnan(arm_commands_velocities_[i]))
     {
       arm_commands_velocities_[i] = 0;
+    }
+    if (std::isnan(arm_commands_accelerations_[i]))
+    {
+      arm_commands_accelerations_[i] = 0;
     }
     if (std::isnan(arm_commands_efforts_[i]))
     {
@@ -928,7 +937,7 @@ void KortexMultiInterfaceHardware::prepareCommands()
 
     base_command_.mutable_actuators(static_cast<int>(i))->set_position(cmd_degrees_tmp_);
     // Velocity command interface not implemented properly in the kortex api
-    // base_command_.mutable_actuators(i)->set_velocity(cmd_vel_tmp_);
+    base_command_.mutable_actuators(static_cast<int>(i))->set_velocity(cmd_vel_tmp_);
     base_command_.mutable_actuators(static_cast<int>(i))->set_command_id(base_command_.frame_id());
   }
 }

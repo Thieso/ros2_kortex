@@ -209,8 +209,7 @@ ros2 launch kortex_bringup gen3.launch.py \
 Alternatively, for a physical robot:
 
 ```bash
-ros2 launch kortex_bringup gen3.launch.py \
-  robot_ip:=192.168.1.10 \
+ros2 launch kortex_bringup gen3.launch.py robot_ip:=192.168.1.10 \
 ```
 You can specify the following arguments if you wish to change your arm configuration:
 
