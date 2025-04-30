@@ -177,6 +177,13 @@
     <axis xyz="0 0 1"/>
     <limit effort="9" lower="-10" upper="10" velocity="1.2218"/>
   </joint>
+  <link name="link4_col_link"/>
+  <joint name="link4_col" type="fixed">
+    <origin rpy="0 0 0" xyz="0 -0.1 0.0"/>
+    <parent link="forearm_link"/>
+    <child link="link4_col_link"/>
+    <axis xyz="0 0 0"/>
+  </joint>
   <link name="spherical_wrist_2_link">
     <inertial>
       <origin rpy="0 0 0" xyz="1E-06 -0.045483 -0.00965"/>
